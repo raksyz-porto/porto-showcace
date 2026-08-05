@@ -30,13 +30,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            line-height: 1.6;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
+        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.6; transition: background-color 0.4s ease, color 0.4s ease; }
 
         /* Light Mode Adjustments */
         body.light-mode #hero p, body.light-mode .project-card p, body.light-mode .social-info p, body.light-mode footer { color: #4a4a68; }
@@ -166,12 +160,11 @@
     <section id="preview" class="reveal">
         <h2 class="section-title">🔴 Live <span>Preview</span></h2>
         <div class="iframe-wrapper">
-            <div class="iframe-fallback" id="loading-preview">Memuat Preview...</div>
+            <div class="iframe-fallback" id="loading-preview">Menunggu Konfigurasi Database...</div>
             <iframe id="live-preview-frame" src="" title="Live Portfolio Preview"></iframe>
         </div>
     </section>
 
-    <!-- Section About Tetap Sama -->
     <section id="about" class="reveal">
         <h2 class="section-title">About <span>Me</span></h2>
         <div class="about-content">
@@ -200,7 +193,6 @@
     </section>
 
     <section id="contact" class="reveal">
-        <!-- Section Contact Tetap Sama -->
         <h2 class="section-title">Get in <span>Touch</span></h2>
         <div class="contact-wrapper">
             <div class="social-info">
@@ -228,8 +220,6 @@
     </footer>
 
     <!-- ================= ADMIN MODALS ================= -->
-    
-    <!-- Modal Login -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <i class="fas fa-times close-modal" onclick="closeModal('loginModal')"></i>
@@ -243,7 +233,6 @@
         </div>
     </div>
 
-    <!-- Modal Admin Dashboard -->
     <div id="adminModal" class="modal">
         <div class="modal-content large">
             <i class="fas fa-times close-modal" onclick="closeModal('adminModal')"></i>
@@ -254,7 +243,6 @@
             
             <div class="loader" id="adminLoader">Menyimpan...</div>
 
-            <!-- Update Live Preview -->
             <div class="glass glass-card" style="padding: 20px; margin-bottom: 30px;">
                 <h3>Update Live Preview URL</h3>
                 <form onsubmit="updatePreviewLink(event)" style="flex-direction: row; align-items: center; gap: 10px; margin-top: 15px;">
@@ -263,7 +251,6 @@
                 </form>
             </div>
 
-            <!-- Tambah Project -->
             <div class="glass glass-card" style="padding: 20px;">
                 <h3>Tambah Project Baru</h3>
                 <form onsubmit="addProject(event)" style="margin-top: 15px;">
@@ -282,21 +269,37 @@
     <!-- ================= JAVASCRIPT ================= -->
     <script>
         // ====================================================================
-        // KONEKSI SUPABASE - WAJIB DIISI!
+        // KONEKSI SUPABASE - WAJIB DIISI JIKA INGIN DATABASE AKTIF
         // ====================================================================
-        const SUPABASE_URL = 'https://zlksaomxuqydgegrishx.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsa3Nhb214dXF5ZGdlZ3Jpc2h4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MTU0MzIsImV4cCI6MjEwMTQ5MTQzMn0.J9Dme9YCNR-khP0x2jZQeRaJnkiVDOci1a_xH1Rfmo4';
+        const SUPABASE_URL = 'MASUKKAN_URL_SUPABASE_ANDA'; 
+        const SUPABASE_ANON_KEY = 'MASUKKAN_ANON_KEY_SUPABASE_ANDA';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabase = null;
+        
+        // Mencegah Crash jika URL/KEY Supabase belum diganti
+        try {
+            if(SUPABASE_URL.includes("MASUKKAN_URL") === false) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch (error) {
+            console.error("Gagal menginisialisasi Supabase:", error);
+        }
 
-        // --- Fetch Data dari Database saat web dimuat ---
+        // --- Fetch Data ---
         document.addEventListener('DOMContentLoaded', async () => {
-            await fetchSettings();
-            await fetchProjects();
-            checkAdminSession();
+            if (supabase) {
+                try {
+                    await fetchSettings();
+                    await fetchProjects();
+                    checkAdminSession();
+                } catch (error) {
+                    document.getElementById('projects-loader').innerText = "Gagal terhubung ke database. Periksa izin akses (RLS).";
+                }
+            } else {
+                document.getElementById('projects-loader').innerText = "Mohon isi URL dan KEY Supabase di kode Anda agar fitur ini berfungsi.";
+            }
         });
 
-        // Ambil link preview
         async function fetchSettings() {
             const { data, error } = await supabase.from('settings').select('live_preview_url').eq('id', 1).single();
             if (data && data.live_preview_url) {
@@ -306,7 +309,6 @@
             }
         }
 
-        // Ambil list projects
         async function fetchProjects() {
             const container = document.getElementById('dynamic-projects');
             document.getElementById('projects-loader').style.display = 'block';
@@ -321,8 +323,7 @@
                     const techArr = project.technologies.split(',').map(t => t.trim());
                     const techTags = techArr.map(tech => `<span>${tech}</span>`).join('');
                     
-                    const isAdmin = isAdminLoggedIn; // Cek status login
-                    const deleteBtn = isAdmin ? `<button onclick="deleteProject('${project.id}')" class="btn btn-danger" style="width:100%; margin-top:10px;"><i class="fas fa-trash"></i> Hapus Project</button>` : '';
+                    const deleteBtn = isAdminLoggedIn ? `<button onclick="deleteProject('${project.id}')" class="btn btn-danger" style="width:100%; margin-top:10px;"><i class="fas fa-trash"></i> Hapus Project</button>` : '';
 
                     container.innerHTML += `
                         <div class="glass glass-card project-card reveal active">
@@ -348,11 +349,12 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 isAdminLoggedIn = true;
-                document.getElementById('open-admin-login').style.color = 'var(--primary)'; // indikator admin aktif
+                document.getElementById('open-admin-login').style.color = 'var(--primary)';
             }
         }
 
         document.getElementById('open-admin-login').addEventListener('click', async () => {
+            if (!supabase) return alert("Silakan isi konfigurasi Supabase terlebih dahulu.");
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 document.getElementById('adminModal').style.display = 'flex';
@@ -379,7 +381,7 @@
                 closeModal('loginModal');
                 document.getElementById('adminModal').style.display = 'flex';
                 document.getElementById('loginForm').reset();
-                fetchProjects(); // Render ulang daftar project agar tombol Hapus muncul
+                fetchProjects();
             }
         }
 
@@ -388,7 +390,7 @@
             isAdminLoggedIn = false;
             closeModal('adminModal');
             alert("Logout berhasil!");
-            fetchProjects(); // Render ulang agar tombol Hapus hilang
+            fetchProjects(); 
         }
 
         // ================= CRUD LOGIC =================
@@ -438,8 +440,9 @@
             }
         }
 
-
         // ================= UI INTERACTION (TEMA, SCROLL, DLL) =================
+        
+        // 1. Toggle Tema Terang/Gelap
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
         const themeIcon = themeToggleBtn.querySelector('i');
         themeToggleBtn.addEventListener('click', () => {
@@ -447,6 +450,7 @@
             themeIcon.className = document.body.classList.contains('light-mode') ? 'fas fa-moon' : 'fas fa-sun';
         });
 
+        // 2. Hamburger Menu untuk Mobile
         const hamburger = document.querySelector('.hamburger');
         const navLinks = document.querySelector('.nav-links');
         hamburger.addEventListener('click', () => {
@@ -454,15 +458,32 @@
             hamburger.querySelector('i').className = navLinks.classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
         });
 
+        // 3. Navbar Sticky Effect
         window.addEventListener('scroll', () => {
             document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
         });
 
-        // Particle System
+        // 4. ANIMASI SCROLL (Bagian yang sebelumnya terhapus)
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        });
+        
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // 5. Efek Canvas Partikel
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         let particlesArray = [];
+        
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
