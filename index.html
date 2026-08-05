@@ -105,10 +105,16 @@
         .admin-project-actions button { flex: 1; padding: 8px; font-size: 0.9rem; }
         
         .contact-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
-        form { display: flex; flex-direction: column; gap: 20px; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        
+        /* STYLE KHUSUS LABEL FORM ADMIN */
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-left: 2px; }
+
         input, textarea { width: 100%; padding: 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text); outline: none; transition: border 0.3s; }
+        input[type="file"] { padding: 10px; cursor: pointer; }
         input:focus, textarea:focus { border-color: var(--primary); }
-        textarea { height: 150px; resize: vertical; }
+        textarea { height: 120px; resize: vertical; }
         
         .social-info h3 { margin-bottom: 20px; font-size: 1.8rem; }
         .social-info p { color: #aaa; margin-bottom: 30px; }
@@ -268,16 +274,45 @@
                 </div>
 
                 <div class="glass glass-card" style="padding: 20px;">
-                    <h3 id="formSectionTitle">Tambah Project Baru</h3>
-                    <form id="projectForm" onsubmit="saveProject(event)" style="margin-top: 15px;">
+                    <h3 id="formSectionTitle" style="margin-bottom: 15px;">Tambah Project Baru</h3>
+                    
+                    <!-- FORM DENGAN LABEL DI ATAS SETIAP KOLOM & UPLOAD FILE KE BUCKET -->
+                    <form id="projectForm" onsubmit="saveProject(event)">
                         <input type="hidden" id="pId">
-                        <input type="text" id="pTitle" placeholder="Judul Project" required>
-                        <textarea id="pDesc" placeholder="Deskripsi Singkat" style="height: 80px;" required></textarea>
-                        <input type="url" id="pImg" placeholder="URL Gambar Utama" required>
-                        <input type="url" id="pDemo" placeholder="Link Demo (https://...)" required>
-                        <input type="url" id="pGithub" placeholder="Link Github (https://...)" required>
-                        <input type="text" id="pTech" placeholder="Teknologi (pisahkan dengan koma)" required>
-                        <div style="display: flex; gap: 10px;">
+                        <input type="hidden" id="pExistingImg">
+
+                        <div class="form-group">
+                            <label for="pTitle">Judul Project</label>
+                            <input type="text" id="pTitle" placeholder="Contoh: E-Gov Dashboard" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pDesc">Deskripsi Singkat</label>
+                            <textarea id="pDesc" placeholder="Tuliskan deskripsi singkat project..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pImgFile">Upload Gambar Project (Bucket Supabase)</label>
+                            <input type="file" id="pImgFile" accept="image/*">
+                            <small style="color: #aaa; font-size: 0.8rem;">*Biarkan kosong jika tidak ingin mengubah gambar saat Edit.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pDemo">Link Demo</label>
+                            <input type="url" id="pDemo" placeholder="https://..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pGithub">Link Github</label>
+                            <input type="url" id="pGithub" placeholder="https://..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pTech">Teknologi</label>
+                            <input type="text" id="pTech" placeholder="React, Node.js, Supabase" required>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
                             <button type="submit" class="btn" id="saveProjectBtn" style="flex: 1;">Tambah Project</button>
                             <button type="button" class="btn btn-outline" id="cancelEditBtn" style="display: none; flex: 1;" onclick="resetProjectForm()">Batal Edit</button>
                         </div>
@@ -441,15 +476,51 @@
             else { alert("Preview URL berhasil diupdate!"); fetchSettings(); }
         }
 
+        // FUNGSI SIMPAN & UPLOAD GAMBAR KE BUCKET SUPABASE
         async function saveProject(e) {
             e.preventDefault();
             showLoader(true);
             
             const id = document.getElementById('pId').value;
+            const fileInput = document.getElementById('pImgFile');
+            let imageUrl = document.getElementById('pExistingImg').value;
+
+            // Jika ada file gambar baru yang dipilih, upload ke Storage Bucket 'project-images'
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                const { data: uploadData, error: uploadError } = await dbClient.storage
+                    .from('project-images')
+                    .upload(filePath, file);
+
+                if (uploadError) {
+                    showLoader(false);
+                    alert("Gagal mengupload gambar ke bucket: " + uploadError.message);
+                    return;
+                }
+
+                // Ambil Public URL dari file yang diupload
+                const { data: publicURLData } = dbClient.storage
+                    .from('project-images')
+                    .getPublicUrl(filePath);
+
+                imageUrl = publicURLData.publicUrl;
+            }
+
+            // Validasi jika belum ada gambar sama sekali saat menambah baru
+            if (!id && !imageUrl) {
+                showLoader(false);
+                alert("Silakan pilih gambar terlebih dahulu!");
+                return;
+            }
+
             const projData = {
                 title: document.getElementById('pTitle').value,
                 description: document.getElementById('pDesc').value,
-                image: document.getElementById('pImg').value,
+                image: imageUrl,
                 demo_link: document.getElementById('pDemo').value,
                 github_link: document.getElementById('pGithub').value,
                 technologies: document.getElementById('pTech').value
@@ -471,12 +542,11 @@
             } else {
                 alert(id ? "Project berhasil diperbarui!" : "Project berhasil ditambahkan!");
                 resetProjectForm();
-                closeModal('adminModal'); // Tutup modal setelah sukses edit/tambah
+                closeModal('adminModal');
                 fetchProjects();
             }
         }
 
-        // MEMBUKA MODAL DAN MENGISI FORM SAAT TOMBOL EDIT DIKLIK
         function triggerEdit(id) {
             const project = allProjectsCache.find(p => p.id === id);
             if (!project) return;
@@ -484,7 +554,8 @@
             document.getElementById('pId').value = project.id;
             document.getElementById('pTitle').value = project.title;
             document.getElementById('pDesc').value = project.description;
-            document.getElementById('pImg').value = project.image;
+            document.getElementById('pExistingImg').value = project.image || '';
+            document.getElementById('pImgFile').value = ''; // Reset input file
             document.getElementById('pDemo').value = project.demo_link;
             document.getElementById('pGithub').value = project.github_link;
             document.getElementById('pTech').value = project.technologies;
@@ -493,14 +564,14 @@
             document.getElementById('saveProjectBtn').innerText = "Simpan Perubahan";
             document.getElementById('cancelEditBtn').style.display = 'block';
             
-            // Buka Modal Dashboard agar form edit langsung terlihat oleh pengguna
             document.getElementById('adminModal').style.display = 'flex';
-            document.querySelector('.modal-body').scrollTo({ top: 300, behavior: 'smooth' });
+            document.querySelector('.modal-body').scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function resetProjectForm() {
             document.getElementById('projectForm').reset();
             document.getElementById('pId').value = '';
+            document.getElementById('pExistingImg').value = '';
             document.getElementById('formSectionTitle').innerText = "Tambah Project Baru";
             document.getElementById('saveProjectBtn').innerText = "Tambah Project";
             document.getElementById('cancelEditBtn').style.display = 'none';
