@@ -15,36 +15,38 @@
         :root {
             --primary: #6C63FF;
             --secondary: #E94560;
-            --bg: #0a0a1a;
+            /* Mode Gelap: Warna Grafit */
+            --bg: #121417;
             --text: #ffffff;
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(108, 99, 255, 0.2);
         }
 
-        /* Light Mode */
+        /* Mode Terang: Warna Hijau Mint */
         body.light-mode {
-            --bg: #f4f6f8;
-            --text: #1a1a2e;
+            --bg: #e8f5e9;
+            --text: #1b382b;
             --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(108, 99, 255, 0.4);
+            --glass-border: rgba(46, 125, 50, 0.3);
+            --primary: #2e7d32;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body { background-color: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.6; transition: background-color 0.4s ease, color 0.4s ease; }
 
-        body.light-mode #hero p, body.light-mode .project-card p, body.light-mode .social-info p, body.light-mode footer { color: #4a4a68; }
-        body.light-mode .tech-tags span { background: rgba(108, 99, 255, 0.15); color: var(--primary); font-weight: 600; }
-        body.light-mode input, body.light-mode textarea { background: rgba(255, 255, 255, 0.9); color: var(--text); border-color: rgba(108, 99, 255, 0.3); }
+        body.light-mode #hero p, body.light-mode .project-card p, body.light-mode .social-info p, body.light-mode footer { color: #2e5a43; }
+        body.light-mode .tech-tags span { background: rgba(46, 125, 50, 0.15); color: var(--primary); font-weight: 600; }
+        body.light-mode input, body.light-mode textarea { background: rgba(255, 255, 255, 0.9); color: var(--text); border-color: rgba(46, 125, 50, 0.3); }
         body.light-mode .iframe-wrapper { background: rgba(0, 0, 0, 0.05); }
         body.light-mode .iframe-fallback { color: rgba(0, 0, 0, 0.5); }
-        body.light-mode nav.scrolled { background: rgba(244, 246, 248, 0.85); }
-        body.light-mode .nav-links { background: rgba(244, 246, 248, 0.95); }
+        body.light-mode nav.scrolled { background: rgba(232, 245, 233, 0.85); }
+        body.light-mode .nav-links { background: rgba(232, 245, 233, 0.95); }
 
         #particles { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
 
         nav { position: fixed; top: 0; width: 100%; padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 100; transition: background 0.3s ease, padding 0.3s ease; }
-        nav.scrolled { background: rgba(10, 10, 26, 0.8); backdrop-filter: blur(10px); padding: 15px 5%; border-bottom: 1px solid var(--glass-border); }
+        nav.scrolled { background: rgba(18, 20, 23, 0.85); backdrop-filter: blur(10px); padding: 15px 5%; border-bottom: 1px solid var(--glass-border); }
         .logo { font-size: 1.5rem; font-weight: 700; color: var(--text); text-decoration: none; }
         .logo span { color: var(--primary); }
         .nav-links { display: flex; gap: 30px; list-style: none; }
@@ -104,7 +106,7 @@
         
         .contact-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
         form { display: flex; flex-direction: column; gap: 20px; }
-        input, textarea { width: 100%; padding: 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 8px; color: white; outline: none; transition: border 0.3s; }
+        input, textarea { width: 100%; padding: 15px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text); outline: none; transition: border 0.3s; }
         input:focus, textarea:focus { border-color: var(--primary); }
         textarea { height: 150px; resize: vertical; }
         
@@ -292,6 +294,7 @@
         
         let dbClient = null;
         let isAdminLoggedIn = false;
+        let allProjectsCache = [];
         
         try {
             if(window.supabase) {
@@ -334,11 +337,12 @@
                 const { data: projects, error } = await dbClient.from('projects').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 
+                allProjectsCache = projects || [];
                 loader.style.display = 'none';
                 container.innerHTML = '';
 
-                if (projects && projects.length > 0) {
-                    projects.forEach(project => {
+                if (allProjectsCache.length > 0) {
+                    allProjectsCache.forEach(project => {
                         const techArr = (project.technologies || "").split(',').map(t => t.trim());
                         const techTags = techArr.map(tech => `<span>${tech}</span>`).join('');
                         
@@ -346,7 +350,7 @@
                         if (isAdminLoggedIn) {
                             adminActions = `
                                 <div class="admin-project-actions">
-                                    <button onclick='editProject(${JSON.stringify(project)})' class="btn btn-warning"><i class="fas fa-edit"></i> Edit</button>
+                                    <button onclick="triggerEdit('${project.id}')" class="btn btn-warning"><i class="fas fa-edit"></i> Edit</button>
                                     <button onclick="deleteProject('${project.id}')" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</button>
                                 </div>
                             `;
@@ -437,7 +441,6 @@
             else { alert("Preview URL berhasil diupdate!"); fetchSettings(); }
         }
 
-        // FUNGSI SIMPAN (BISA UNTUK TAMBAH ATAU EDIT BERDASARKAN ADA TIDAKNYA ID)
         async function saveProject(e) {
             e.preventDefault();
             showLoader(true);
@@ -454,11 +457,9 @@
 
             let error;
             if (id) {
-                // Jika ada ID, berarti mode EDIT (Update)
                 const res = await dbClient.from('projects').update(projData).eq('id', id);
                 error = res.error;
             } else {
-                // Jika tidak ada ID, berarti mode TAMBAH BARU (Insert)
                 const res = await dbClient.from('projects').insert([projData]);
                 error = res.error;
             }
@@ -474,8 +475,10 @@
             }
         }
 
-        // MEMASUKKAN DATA KE FORM SAAT TOMBOL EDIT DIKLIK
-        function editProject(project) {
+        function triggerEdit(id) {
+            const project = allProjectsCache.find(p => p.id === id);
+            if (!project) return;
+
             document.getElementById('pId').value = project.id;
             document.getElementById('pTitle').value = project.title;
             document.getElementById('pDesc').value = project.description;
@@ -488,11 +491,9 @@
             document.getElementById('saveProjectBtn').innerText = "Simpan Perubahan";
             document.getElementById('cancelEditBtn').style.display = 'block';
             
-            // Scroll form ke bagian atas modal agar terlihat
             document.querySelector('.modal-body').scrollTo({ top: 300, behavior: 'smooth' });
         }
 
-        // MERESET FORM KEMBALI KE MODE TAMBAH BARU
         function resetProjectForm() {
             document.getElementById('projectForm').reset();
             document.getElementById('pId').value = '';
@@ -560,7 +561,7 @@
             }
             draw() {
                 const isLight = document.body.classList.contains('light-mode');
-                ctx.fillStyle = isLight ? `rgba(108, 99, 255, ${Math.random() * 0.3 + 0.1})` : `rgba(108, 99, 255, ${Math.random() * 0.5 + 0.1})`;
+                ctx.fillStyle = isLight ? `rgba(46, 125, 50, ${Math.random() * 0.3 + 0.1})` : `rgba(108, 99, 255, ${Math.random() * 0.5 + 0.1})`;
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             }
         }
