@@ -471,10 +471,12 @@
             } else {
                 alert(id ? "Project berhasil diperbarui!" : "Project berhasil ditambahkan!");
                 resetProjectForm();
+                closeModal('adminModal'); // Tutup modal setelah sukses edit/tambah
                 fetchProjects();
             }
         }
 
+        // MEMBUKA MODAL DAN MENGISI FORM SAAT TOMBOL EDIT DIKLIK
         function triggerEdit(id) {
             const project = allProjectsCache.find(p => p.id === id);
             if (!project) return;
@@ -491,6 +493,8 @@
             document.getElementById('saveProjectBtn').innerText = "Simpan Perubahan";
             document.getElementById('cancelEditBtn').style.display = 'block';
             
+            // Buka Modal Dashboard agar form edit langsung terlihat oleh pengguna
+            document.getElementById('adminModal').style.display = 'flex';
             document.querySelector('.modal-body').scrollTo({ top: 300, behavior: 'smooth' });
         }
 
