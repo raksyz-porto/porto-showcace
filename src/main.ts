@@ -129,6 +129,9 @@ function createAbout() {
   section.innerHTML = `
     <h2 class="section-title">ABOUT</h2>
     <div class="about-content">
+      <div class="about-image">
+        <img src="/avatar.jpg" alt="Raksyz avatar" class="avatar"/>
+      </div>
       <div class="about-text">
         <p class="about-intro">
           Hello! I'm Raka, a passionate full stack developer with experience building 

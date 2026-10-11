@@ -286,6 +286,32 @@ section {
 }
 
 /* About */
+.about-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.about-image {
+  display: flex;
+  justify-content: center;
+}
+
+.avatar {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s;
+}
+
+.avatar:hover {
+  transform: scale(1.02);
+}
+
 .about-intro {
   font-size: 1.25rem;
   line-height: 1.7;
