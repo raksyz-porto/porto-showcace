@@ -285,24 +285,37 @@ function createContact() {
   section.id = 'contact'
   section.className = 'reveal'
   section.innerHTML = `
-    <h2 class="section-title">Contact</h2>
     <div class="contact-content">
-      <p class="contact-text">
-        I'm currently available for freelance work and full-time opportunities.
-        Let's build something awesome together!
-      </p>
+      <h2 class="section-title">Start a Project</h2>
+      <p class="contact-subtitle">Let's Talk</p>
+      <a href="mailto:raka@raksyz.dev" class="contact-email">raka@raksyz.dev</a>
+      <form class="contact-form" id="contact-form">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" required placeholder="Your Name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required placeholder="Email Address">
+        </div>
+        <div class="form-group">
+          <label for="message">Tell me about your project...</label>
+          <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Send Message</button>
+      </form>
       <div class="social-links">
-        <a href="https://github.com/raksyz-dev" target="_blank" class="social-link">
-          <i class="fab fa-github"></i> GitHub
+        <a href="https://github.com/raksyz-dev" target="_blank" class="social-link" aria-label="GitHub">
+          <i class="fab fa-github"></i>
         </a>
-        <a href="https://linkedin.com/in/raksyz" target="_blank" class="social-link">
-          <i class="fab fa-linkedin"></i> LinkedIn
+        <a href="https://linkedin.com/in/raksyz" target="_blank" class="social-link" aria-label="LinkedIn">
+          <i class="fab fa-linkedin"></i>
         </a>
-        <a href="https://twitter.com/rkanovian" target="_blank" class="social-link">
-          <i class="fab fa-twitter"></i> Twitter
+        <a href="https://twitter.com/rkanovian" target="_blank" class="social-link" aria-label="Twitter">
+          <i class="fab fa-twitter"></i>
         </a>
-        <a href="mailto:hello@raksyz.dev" class="social-link">
-          <i class="fas fa-envelope"></i> Email
+        <a href="mailto:raka@raksyz.dev" class="social-link" aria-label="Email">
+          <i class="fas fa-envelope"></i>
         </a>
       </div>
     </div>
@@ -490,6 +503,32 @@ async function init() {
   // Load projects
   fetchProjects()
   checkAdminSession()
+  
+  // Contact form handler
+  const contactForm = document.getElementById('contact-form') as HTMLFormElement
+  contactForm?.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const formData = new FormData(contactForm)
+    const name = formData.get('name')
+    const message = formData.get('message')
+    
+    // Mailto fallback
+    const mailtoLink = `mailto:raka@raksyz.dev?subject=Project Inquiry from ${encodeURIComponent(String(name))}&body=${encodeURIComponent(String(message))}`
+    window.location.href = mailtoLink
+    
+    // Reset form
+    contactForm.reset()
+    
+    // Show success feedback
+    const submitBtn = contactForm.querySelector('.btn-submit') as HTMLButtonElement
+    const originalText = submitBtn.textContent
+    submitBtn.textContent = 'Message Sent! ✓'
+    submitBtn.style.background = 'var(--accent)'
+    setTimeout(() => {
+      submitBtn.textContent = originalText
+      submitBtn.style.background = ''
+    }, 3000)
+  })
 }
 
 init()
