@@ -1,11 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
 /* Raksyz portfolio — itssharl.ee style replica
-   Minimalist editorial, light cream, big uppercase type, solid colors */
+   Minimalist editorial, light cream, solid colors */
 
 :root {
   --bg: #f2ede6;
   --text: #1a1a1a;
   --muted: #6b6560;
   --accent: #606887;
+  --accent-light: #8b91a8;
   --border: #d8d2c8;
   --card: #faf8f4;
 }
@@ -26,6 +29,13 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
+  font-weight: 400;
+}
+
+/* Heading font */
+h1, h2, h3, h4, .section-title, .hero-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
 }
 
 /* Splashscreen */
@@ -131,12 +141,12 @@ section {
 }
 
 .section-title {
-  font-size: clamp(3rem, 8vw, 6rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   margin-bottom: 3rem;
-  line-height: 1;
+  line-height: 1.1;
+  color: var(--text);
 }
 
 /* Hero */
@@ -146,16 +156,21 @@ section {
 }
 
 .hero-title {
-  font-size: clamp(2.5rem, 7vw, 5rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  margin-bottom: 2rem;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.5rem;
 }
 
 .hero-title span {
   display: block;
+  color: var(--accent);
+}
+
+.hero-title em {
+  font-style: italic;
+  font-weight: 400;
 }
 
 .hero-subtitle {
@@ -288,14 +303,30 @@ section {
 /* About */
 .about-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 4rem;
   align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .about-image {
   display: flex;
   justify-content: center;
+  position: relative;
+}
+
+.about-image::before {
+  content: '';
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+  border-radius: 12px;
+  top: -10px;
+  left: -10px;
+  z-index: -1;
+  opacity: 0.3;
 }
 
 .avatar {
@@ -303,35 +334,48 @@ section {
   max-width: 320px;
   aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s;
+  border-radius: 12px;
+  box-shadow: 0 12px 48px rgba(96, 104, 135, 0.25);
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 3px solid var(--bg);
 }
 
 .avatar:hover {
-  transform: scale(1.02);
+  transform: scale(1.03) translateY(-4px);
+  box-shadow: 0 16px 64px rgba(96, 104, 135, 0.35);
 }
 
 .about-intro {
-  font-size: 1.25rem;
-  line-height: 1.7;
-  max-width: 700px;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: var(--text);
   margin-bottom: 2rem;
+  font-weight: 300;
 }
 
 .skills-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 .skill-item {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.5rem 0.9rem;
   border: 1px solid var(--border);
-  border-radius: 2px;
+  border-radius: 6px;
   background: var(--card);
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.skill-item:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--bg);
+  transform: translateY(-2px);
 }
 
 /* Contact */

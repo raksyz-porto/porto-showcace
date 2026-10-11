@@ -148,8 +148,8 @@ function createHero() {
   hero.innerHTML = `
     <div class="hero-content">
       <h1 class="hero-title">
-        <span class="line-1">HEY, I'M RAKA</span>
-        <span class="line-2">BUT YOU CAN CALL ME RAKSYZ</span>
+        <span class="line-1">Hey, I'm Raka</span>
+        <span class="line-2">Call me <em>Raksyz</em></span>
       </h1>
       <p class="hero-subtitle">
         I'm a full stack web developer<br/>
@@ -170,7 +170,7 @@ function createProjects() {
   section.id = 'projects'
   section.className = 'reveal'
   section.innerHTML = `
-    <h2 class="section-title">WORK</h2>
+    <h2 class="section-title">Work</h2>
     <div class="projects-loader">
       <i class="fas fa-spinner fa-spin"></i> Loading projects...
     </div>
@@ -185,7 +185,7 @@ function createAbout() {
   section.id = 'about'
   section.className = 'reveal'
   section.innerHTML = `
-    <h2 class="section-title">ABOUT</h2>
+    <h2 class="section-title">About</h2>
     <div class="about-content">
       <div class="about-image">
         <img src="/avatar.jpg" alt="Raksyz avatar" class="avatar"/>
@@ -218,7 +218,7 @@ function createContact() {
   section.id = 'contact'
   section.className = 'reveal'
   section.innerHTML = `
-    <h2 class="section-title">CONTACT</h2>
+    <h2 class="section-title">Contact</h2>
     <div class="contact-content">
       <p class="contact-text">
         I'm currently available for freelance work and full-time opportunities.
