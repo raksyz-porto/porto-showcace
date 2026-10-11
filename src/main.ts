@@ -150,7 +150,7 @@ function createHero() {
     <div class="hero-content">
       <h1 class="hero-title">
         <span class="line-1">Hey, I'm Raka</span>
-        <span class="line-2">Call me <em>Raksyz</em></span>
+        <span class="line-2">you can Call me <em>Raksyz</em></span>
       </h1>
       <p class="hero-subtitle">
         I'm a full stack web developer<br/>
