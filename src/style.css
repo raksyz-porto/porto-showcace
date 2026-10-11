@@ -562,6 +562,7 @@ section {
   grid-template-columns: 1fr;
   gap: 1.25rem;
   margin-bottom: 1.25rem;
+  align-items: stretch;
 }
 
 .form-group {
@@ -601,21 +602,25 @@ section {
 
 .form-group textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 140px;
+  flex: 1;
 }
 
 .message-group {
-  min-height: 160px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .brand-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 160px;
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 100%;
 }
 
 .contact-brand {
@@ -624,10 +629,12 @@ section {
   align-items: center;
   margin: 0;
   padding: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .brand-logo {
-  max-width: 220px;
+  max-width: 200px;
   width: 100%;
   height: auto;
   display: block;
@@ -643,8 +650,16 @@ section {
     grid-template-columns: 1fr 1fr;
   }
   
+  .message-group textarea {
+    min-height: 160px;
+  }
+  
+  .brand-placeholder {
+    min-height: 100%;
+  }
+  
   .brand-logo {
-    max-width: 180px;
+    max-width: 220px;
   }
 }
 
@@ -661,11 +676,15 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1.5rem auto 0;
+    margin: 2rem auto 0;
+    padding: 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
   }
   
   .brand-logo {
-    max-width: 200px;
+    max-width: 220px;
   }
 }
 
