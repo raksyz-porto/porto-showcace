@@ -509,24 +509,25 @@ section {
 }
 
 .contact-content {
-  max-width: 600px;
+  max-width: 650px;
   margin: 0 auto;
   text-align: center;
 }
 
 .contact-text {
-  font-size: 1rem;
-  max-width: 500px;
-  margin: 0 auto 1.5rem;
+  font-size: 1.05rem;
+  max-width: 550px;
+  margin: 0 auto 2rem;
   color: var(--muted);
   line-height: 1.7;
 }
 
 .social-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .social-link {
@@ -534,19 +535,22 @@ section {
   text-decoration: none;
   font-weight: 600;
   font-size: 0.85rem;
-  padding: 0.65rem 1.1rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--border);
   border-radius: 6px;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  justify-content: center;
+  gap: 0.5rem;
   transition: all 0.2s;
+  min-height: 44px;
 }
 
 .social-link:hover {
   background: var(--text);
   color: var(--bg);
   border-color: var(--text);
+  transform: translateY(-2px);
 }
 
 footer {
