@@ -301,9 +301,14 @@ function createContact() {
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group">
+          <div class="form-group message-group">
             <label for="message">Tell me about your project...</label>
             <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project..."></textarea>
+          </div>
+          <div class="brand-placeholder">
+            <div class="contact-brand">
+              <img src="/logo-brand.jpg" alt="Raksyz Brand" class="brand-logo">
+            </div>
           </div>
         </div>
         <button type="submit" class="btn-submit">Send Message</button>
