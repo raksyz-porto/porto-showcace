@@ -638,11 +638,24 @@ section {
   width: 100%;
   height: auto;
   display: block;
-  transition: transform 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 4px 12px rgba(96, 104, 135, 0.2)) drop-shadow(0 8px 24px rgba(96, 104, 135, 0.15));
+  animation: float 6s ease-in-out infinite;
 }
 
 .brand-logo:hover {
-  transform: scale(1.02);
+  transform: scale(1.05) translateY(-4px);
+  filter: drop-shadow(0 8px 24px rgba(96, 104, 135, 0.3)) drop-shadow(0 12px 40px rgba(96, 104, 135, 0.25));
+  animation-play-state: paused;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.02);
+  }
 }
 
 @media (min-width: 768px) {
