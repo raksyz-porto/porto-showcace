@@ -428,10 +428,8 @@ async function init() {
   }, 800)
   
   // Load projects
-  if (dbClient) {
-    fetchProjects()
-    checkAdminSession()
-  }
+  fetchProjects()
+  checkAdminSession()
 }
 
 init()
