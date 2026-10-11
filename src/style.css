@@ -422,4 +422,11 @@ footer {
   .full-identity {
     display: none;
   }
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .avatar {
+    max-width: 240px;
+  }
 }
