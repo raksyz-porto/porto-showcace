@@ -21,6 +21,64 @@ interface Project {
 let dbClient: any = null
 let allProjects: Project[] = []
 
+// Dummy projects for demo (fallback if Supabase not configured)
+const DUMMY_PROJECTS: Project[] = [
+  {
+    id: '1',
+    title: 'Portal Warga Kelurahan (E-GOV V5)',
+    description: 'Government public service portal with 768K+ residents, real-time announcements, and digital document processing',
+    image: 'https://placehold.co/600x400/1a1a2e/eee?text=E-GOV+V5',
+    demo_link: 'https://e-gov-v5.vercel.app/',
+    github_link: 'https://github.com/raksyz-porto',
+    technologies: 'Next.js,React,Supabase'
+  },
+  {
+    id: '2',
+    title: 'RAKSYZ SIMPLE PORTFOLIO',
+    description: 'Clean minimalist portfolio with smooth animations and Supabase CMS integration',
+    image: 'https://placehold.co/600x400/606887/fff?text=SIMPLE+PORTFOLIO',
+    demo_link: '#',
+    github_link: 'https://github.com/raksyz-dev',
+    technologies: 'Vite,TypeScript,CSS'
+  },
+  {
+    id: '3',
+    title: 'MODERN PORTFOLIO SHOWCASE',
+    description: 'Full-featured portfolio with admin panel, image upload, and real-time sync',
+    image: 'https://placehold.co/600x400/2e7d32/fff?text=MODERN+SHOWCASE',
+    demo_link: 'https://www.raksyz.bond/',
+    github_link: 'https://github.com/raksyz-porto/portfolio-dev',
+    technologies: 'Next.js,Supabase,Auth'
+  },
+  {
+    id: '4',
+    title: 'Luxury Store',
+    description: 'Premium e-commerce platform with elegant design and seamless checkout experience',
+    image: 'https://placehold.co/600x400/1a1a1a/d4af37?text=LUXURY+STORE',
+    demo_link: '#',
+    github_link: '#',
+    technologies: 'React,Stripe,Tailwind'
+  },
+  {
+    id: '5',
+    title: 'Fintech App',
+    description: 'Mobile-first financial dashboard with real-time transactions and analytics',
+    image: 'https://placehold.co/600x400/0d47a1/fff?text=FINTECH+APP',
+    demo_link: '#',
+    github_link: '#',
+    technologies: 'React Native,Node.js'
+  },
+  {
+    id: '6',
+    title: 'AI Generator',
+    description: 'AI-powered content generation tool with modern interface and fast processing',
+    image: 'https://placehold.co/600x400/6a1b9a/fff?text=AI+GENERATOR',
+    demo_link: '#',
+    github_link: '#',
+    technologies: 'Python,React,API'
+  }
+]
+
 // Init Supabase
 async function initSupabase() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -198,7 +256,7 @@ function createFooter() {
 // Fetch projects from Supabase
 async function fetchProjects() {
   if (!dbClient) {
-    document.getElementById('projects-grid')!.innerHTML = '<p>Supabase not configured</p>'
+    renderProjects() // Fallback to dummy projects
     return
   }
   
@@ -214,21 +272,25 @@ async function fetchProjects() {
     renderProjects()
   } catch (err) {
     console.error('Error fetching projects:', err)
-    document.getElementById('projects-grid')!.innerHTML = '<p>Failed to load projects</p>'
+    renderProjects() // Fallback to dummy on error
   }
 }
 
 // Render projects
 function renderProjects() {
   const grid = document.getElementById('projects-grid')
-  if (!grid || allProjects.length === 0) {
-    grid!.innerHTML = '<p class="no-projects">No projects yet</p>'
+  if (!grid) return
+  
+  const projects = allProjects.length > 0 ? allProjects : DUMMY_PROJECTS
+  
+  if (projects.length === 0) {
+    grid.innerHTML = '<p class="no-projects">No projects yet</p>'
     return
   }
   
-  grid.innerHTML = allProjects
-    .map((project) => `
-      <div class="project-card reveal">
+  grid.innerHTML = projects
+    .map((project, index) => `
+      <div class="project-card reveal" data-project-index="${index}" style="cursor: pointer;">
         <img src="${project.image}" alt="${project.title}" loading="lazy"/>
         <div class="project-info">
           <h3>${project.title}</h3>
@@ -244,6 +306,80 @@ function renderProjects() {
       </div>
     `)
     .join('')
+  
+  // Add click handlers for modal
+  grid.querySelectorAll('.project-card').forEach((card, idx) => {
+    card.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'A') return // Don't open modal if clicking links
+      openProjectModal(projects[idx])
+    })
+  })
+}
+
+// Open project modal
+function openProjectModal(project: Project) {
+  const existingModal = document.getElementById('project-modal')
+  if (existingModal) existingModal.remove()
+  
+  const modal = document.createElement('div')
+  modal.id = 'project-modal'
+  modal.className = 'modal-overlay'
+  modal.innerHTML = `
+    <div class="modal-content">
+      <button class="modal-close" aria-label="Close modal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="modal-image">
+        <img src="${project.image}" alt="${project.title}"/>
+      </div>
+      <div class="modal-body">
+        <h2>${project.title}</h2>
+        <p class="modal-description">${project.description}</p>
+        <div class="modal-tags">
+          ${(project.technologies || '').split(',').map(t => `<span>${t.trim()}</span>`).join('')}
+        </div>
+        <div class="modal-links">
+          <a href="${project.demo_link}" target="_blank" class="btn-outline">Live Demo</a>
+          <a href="${project.github_link}" target="_blank" class="btn">View Code</a>
+        </div>
+      </div>
+    </div>
+  `
+  
+  document.body.appendChild(modal)
+  
+  // Close handlers
+  const closeBtn = modal.querySelector('.modal-close')
+  const closeOnOverlay = (e: MouseEvent) => {
+    if (e.target === modal) closeModal()
+  }
+  
+  const closeModal = () => {
+    modal.style.opacity = '0'
+    setTimeout(() => {
+      modal.remove()
+      document.body.style.overflow = ''
+    }, 300)
+  }
+  
+  closeBtn?.addEventListener('click', closeModal)
+  modal.addEventListener('click', closeOnOverlay)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal()
+  })
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden'
+  
+  // Animate in
+  requestAnimationFrame(() => {
+    modal.style.opacity = '1'
+    modal.querySelector('.modal-content')?.classList.add('visible')
+  })
 }
 
 // Check admin session (placeholder for future auth UI)
