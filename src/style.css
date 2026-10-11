@@ -550,13 +550,20 @@ section {
 }
 
 .contact-form {
-  max-width: 550px;
+  max-width: 700px;
   margin: 0 auto 2.5rem;
   text-align: left;
 }
 
-.form-group {
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
   margin-bottom: 1.25rem;
+}
+
+.form-group {
+  margin-bottom: 0;
 }
 
 .form-group label {
@@ -612,6 +619,12 @@ section {
   background: var(--accent);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(96, 104, 135, 0.25);
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .social-links {

@@ -290,17 +290,21 @@ function createContact() {
       <p class="contact-subtitle">Let's Talk</p>
       <a href="mailto:raka@raksyz.dev" class="contact-email">raka@raksyz.dev</a>
       <form class="contact-form" id="contact-form">
-        <div class="form-group">
-          <label for="name">Your Name</label>
-          <input type="text" id="name" name="name" required placeholder="Your Name">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" required placeholder="Your Name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="Email Address">
+          </div>
         </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" required placeholder="Email Address">
-        </div>
-        <div class="form-group">
-          <label for="message">Tell me about your project...</label>
-          <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project..."></textarea>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="message">Tell me about your project...</label>
+            <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project..."></textarea>
+          </div>
         </div>
         <button type="submit" class="btn-submit">Send Message</button>
       </form>
