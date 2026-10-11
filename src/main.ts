@@ -118,17 +118,18 @@ function showSplashscreen() {
 function createNav() {
   const nav = document.createElement('nav')
   nav.innerHTML = `
-    <div class="nav-left" style="display:none;">
+    <div class="nav-left">
       <a href="/" class="logo">
         <svg data-name="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
           <path d="M24 8c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16S32.8 8 24 8zm0 28c-6.6 0-12-5.4-12-12S17.4 12 24 12s12 5.4 12 12-5.4 12-12 12z" fill="currentColor"/>
         </svg>
       </a>
-      <h5 class="full-identity" style="display:none;">
+      <h5 class="full-identity">
         <span class="nickname">raksyz</span>/<span class="fullname">raka</span>
       </h5>
     </div>
-    <div class="nav-right" style="display:none;">
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <div class="nav-right">
       <ul class="nav-links">
         <li><a href="#hero">Home</a></li>
         <li><a href="#projects">Work</a></li>
@@ -138,6 +139,22 @@ function createNav() {
       </ul>
     </div>
   `
+  // Hamburger toggle
+  const hamburger = nav.querySelector('.hamburger') as HTMLElement
+  const navLinks = nav.querySelector('.nav-links') as HTMLElement
+  hamburger?.addEventListener('click', () => {
+    const isActive = navLinks.classList.toggle('active')
+    hamburger.setAttribute('aria-expanded', String(isActive))
+    hamburger.textContent = isActive ? '✕' : '☰'
+  })
+  // Close menu on link click (mobile)
+  nav.querySelectorAll('.nav-links a').forEach((link) => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('active')
+      hamburger.textContent = '☰'
+      hamburger.setAttribute('aria-expanded', 'false')
+    })
+  })
   return nav
 }
 
@@ -469,14 +486,6 @@ async function init() {
   setTimeout(() => {
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
   }, 500)
-  
-  // Nav show after splash
-  setTimeout(() => {
-    const navLeft = document.querySelector('.nav-left')
-    const navRight = document.querySelector('.nav-right')
-    if (navLeft) (navLeft as HTMLElement).style.display = 'block'
-    if (navRight) (navRight as HTMLElement).style.display = 'block'
-  }, 800)
   
   // Load projects
   fetchProjects()
