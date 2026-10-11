@@ -133,6 +133,7 @@ function createNav() {
         <li><a href="#hero">Home</a></li>
         <li><a href="#projects">Work</a></li>
         <li><a href="#about">About</a></li>
+        <li><a href="#education">Education</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </div>
@@ -207,6 +208,55 @@ function createAbout() {
           <span class="skill-item">Docker</span>
         </div>
       </div>
+    </div>
+  `
+  return section
+}
+
+// Education data
+const EDUCATION_DATA = [
+  {
+    degree: 'Bachelor of Computer Science',
+    school: 'University of Technology Indonesia',
+    year: '2020 - 2024',
+    description: 'Focus on Software Engineering and Web Technologies. GPA: 3.8/4.0',
+    icon: '🎓'
+  },
+  {
+    degree: 'Full Stack Web Development Certification',
+    school: 'Dicoding Indonesia',
+    year: '2023',
+    description: 'Specialized in React, Node.js, and Cloud Architecture',
+    icon: '📜'
+  },
+  {
+    degree: 'Front-End Development Bootcamp',
+    school: 'Hacktiv8',
+    year: '2022',
+    description: 'Intensive 12-week program on modern JavaScript frameworks',
+    icon: '💻'
+  }
+]
+
+// Education section
+function createEducation() {
+  const section = document.createElement('section')
+  section.id = 'education'
+  section.className = 'reveal'
+  section.innerHTML = `
+    <h2 class="section-title">Education</h2>
+    <div class="education-timeline">
+      ${EDUCATION_DATA.map((edu, index) => `
+        <div class="education-card ${index % 2 === 0 ? 'left' : 'right'}">
+          <div class="education-icon">${edu.icon}</div>
+          <div class="education-content">
+            <div class="education-year">${edu.year}</div>
+            <h3 class="education-degree">${edu.degree}</h3>
+            <p class="education-school">${edu.school}</p>
+            <p class="education-desc">${edu.description}</p>
+          </div>
+        </div>
+      `).join('')}
     </div>
   `
   return section
@@ -400,6 +450,7 @@ async function init() {
   app.appendChild(createHero())
   app.appendChild(createProjects())
   app.appendChild(createAbout())
+  app.appendChild(createEducation())
   app.appendChild(createContact())
   app.appendChild(createFooter())
   
